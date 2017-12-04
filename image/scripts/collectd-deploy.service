@@ -1,0 +1,14 @@
+[Unit]
+Description=Simple service file to configure collectd
+Wants=collectd.service
+Before=collectd.service
+
+[Service]
+Type=oneshot
+# unsupported by systemd 219
+#PassEnvironment=COLLECTD_GR_LOC COLLECTD_GR_HOST COLLECTD_GR_PORT
+ExecStart=/bin/sh /usr/libexec/collectd-deploy.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,7 @@
+[centos-opstools-release]
+name=CentOS-7 - OpsTools - release
+baseurl=http://mirror.centos.org/centos/$releasever/opstools/$basearch/
+gpgcheck=0
+enabled=1
+skip_if_unavailable=1
+
