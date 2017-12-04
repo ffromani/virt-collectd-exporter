@@ -14,6 +14,7 @@ import (
 	"github.com/fromanirh/virt-collectd-exporter/pkg/nameconv"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var UnknownSecurityLevel = errors.New("Unknown security level")
@@ -83,7 +84,7 @@ func (c *Collector) Configure(conf Config) error {
 		Methods("GET").
 		Path(conf.MetricsURLPath).
 		Name(name).
-		Handler(Logger(prometheus.Handler(), name))
+		Handler(Logger(promhttp.Handler(), name))
 
 	return nil
 }
