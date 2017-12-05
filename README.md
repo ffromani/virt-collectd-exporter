@@ -43,7 +43,9 @@ or maybe the
 The collectd [write_prometheus plugin](https://collectd.org/wiki/index.php/Plugin:Write_Prometheus)
 
 
-## run it
+## recipes
+
+### run the container
 ```
 docker run \
 	${OPTIONS} \
@@ -53,4 +55,20 @@ docker run \
 	-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 	-v /var/run/libvirt/libvirt-sock-ro:/var/lib/libvirt/libvirt-sock-ro:ro \
 	${IMAGE_NAME}
+```
+
+### list container properties
+```
+docker ps
+```
+```
+machinectl
+```
+
+### inspect the container logs
+```
+docker logs ${DOCKER_ID}
+```
+```
+journalctl -M ${MACHINE_ID}
 ```
