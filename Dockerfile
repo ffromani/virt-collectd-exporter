@@ -1,4 +1,4 @@
-FROM centos:7
+FROM centos:7.4.1708
 ENV container docker
 
 LABEL maintainer Francesco Romani <fromani@redhat.com>
@@ -16,20 +16,24 @@ rm -f /lib/systemd/system/systemd-update-utmp*;
 RUN systemctl set-default multi-user.target
 ENV init /lib/systemd/systemd
 
-ADD image/configs/opstools.repo /etc/yum.repos.d
+ADD image/repos/opstools.repo /etc/yum.repos.d
 
 # HACK around missing PassEnvironment. We need binutils
 RUN yum install -y collectd collectd-virt binutils && yum clean all
 
 ADD image/configs/collectd.conf /etc/collectd.conf
 ADD image/configs/virt.conf /etc/collectd.d/virt.conf
+ADD image/configs/network.conf /etc/collectd.d/network.conf
 
 RUN mkdir /etc/systemd/system/collectd.service.d/
-ADD image/scripts/collectd-deploy.conf /etc/systemd/system/collectd.service.d/
+ADD image/scripts/collectd-deps.conf /etc/systemd/system/collectd.service.d/
 ADD image/scripts/collectd-deploy.service /etc/systemd/system/
 ADD image/scripts/collectd-deploy.sh /usr/libexec/
 
-RUN systemctl enable collectd-deploy.service collectd.service
+ADD cmd/virt-collectd-exporter/virt-collectd-exporter /usr/sbin/
+ADD image/scripts/virt-collectd-exporter.service /etc/systemd/system/
+
+RUN systemctl enable collectd-deploy.service collectd.service virt-collectd-exporter.service
 
 # https://developers.redhat.com/blog/2016/09/13/running-systemd-in-a-non-privileged-container/
 STOPSIGNAL SIGRTMIN+3
