@@ -16,7 +16,9 @@ rm -f /lib/systemd/system/systemd-update-utmp*;
 RUN systemctl set-default multi-user.target
 ENV init /lib/systemd/systemd
 
-ADD image/repos/opstools.repo /etc/yum.repos.d
+#ADD image/repos/opstools.repo /etc/yum.repos.d
+RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
+yum-config-manager --enable epel-testing
 
 # HACK around missing PassEnvironment. We need binutils
 RUN yum install -y collectd collectd-virt binutils && yum clean all
