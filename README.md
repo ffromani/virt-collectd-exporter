@@ -41,3 +41,16 @@ may want to use the
 Promethues' [collectd_exporter](https://github.com/prometheus/collectd_exporter)
 or maybe the
 The collectd [write_prometheus plugin](https://collectd.org/wiki/index.php/Plugin:Write_Prometheus)
+
+
+## run it
+```
+docker run \
+	${OPTIONS} \
+	-p 9103:9103 \
+	--tmpfs /run \
+	--tmpfs /tmp \
+	-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+	-v /var/run/libvirt/libvirt-sock-ro:/var/lib/libvirt/libvirt-sock-ro:ro \
+	${IMAGE_NAME}
+```
