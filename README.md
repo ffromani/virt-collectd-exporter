@@ -56,19 +56,28 @@ docker run \
 	-v /var/run/libvirt/libvirt-sock-ro:/var/lib/libvirt/libvirt-sock-ro:ro \
 	${IMAGE_NAME}
 ```
+CAVEAT: on Centos/EL boxes, allow container cgroup managemnt, example:
+```
+# setsebool -P container_manage_cgroup=on
+```
 
 ### list container properties
 ```
-docker ps
+$ docker ps
 ```
 ```
-machinectl
+$ machinectl
 ```
 
 ### inspect the container logs
 ```
-docker logs ${DOCKER_ID}
+$ docker logs ${DOCKER_ID}
 ```
 ```
-journalctl -M ${MACHINE_ID}
+# journalctl -M ${MACHINE_ID}
+```
+
+### access the metrics
+```
+$ curl http://localhost:9103/metrics
 ```
