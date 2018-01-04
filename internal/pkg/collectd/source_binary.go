@@ -18,7 +18,7 @@ type binaryProtoCollector struct {
 	lastUpdate prometheus.Gauge
 }
 
-func (b *binaryProtoCollector) Configure(conf Config) error {
+func (b *binaryProtoCollector) configureTypesDB(conf Config) error {
 	if conf.CollectdTypesDBPath != "" {
 		file, err := os.Open(conf.CollectdTypesDBPath)
 		if err != nil {
@@ -33,7 +33,10 @@ func (b *binaryProtoCollector) Configure(conf Config) error {
 		b.srv.TypesDB = typesDB
 		log.Printf("CollectD types.db: '%s'", conf.CollectdTypesDBPath)
 	}
+	return nil
+}
 
+func (b *binaryProtoCollector) configureSecurity(conf Config) error {
 	if conf.CollectdAuthPath != "" {
 		b.srv.PasswordLookup = network.NewAuthFile(conf.CollectdAuthPath)
 		log.Printf("CollectD auth file: '%s'", conf.CollectdAuthPath)
@@ -50,6 +53,21 @@ func (b *binaryProtoCollector) Configure(conf Config) error {
 		return UnknownSecurityLevel
 	}
 	log.Printf("CollectD security level: '%s'", conf.CollectdSecurityLevel)
+	return nil
+}
+
+func (b *binaryProtoCollector) Configure(conf Config) error {
+	var err error
+
+	err = b.configureTypesDB(conf)
+	if err != nil {
+		return err
+	}
+
+	err = b.configureSecurity(conf)
+	if err != nil {
+		return err
+	}
 
 	addr, err := net.ResolveUDPAddr("udp", b.address)
 	if err != nil {
