@@ -101,10 +101,11 @@ func (c *Collector) Run(ctx context.Context) {
 		go src.Run(ctx)
 	}
 
-	log.Printf("Prometheus endpoint: starting")
-	go log.Fatal(http.ListenAndServe(c.address, c.router))
+	log.Printf("Sample processing loop: starting")
+	go c.processSamples()
 
-	c.processSamples()
+	log.Printf("Prometheus endpoint: starting")
+	log.Fatal(http.ListenAndServe(c.address, c.router))
 }
 
 func (c Collector) processSamples() {
