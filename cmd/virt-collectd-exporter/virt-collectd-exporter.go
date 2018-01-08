@@ -19,6 +19,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/fromanirh/virt-collectd-exporter/internal/pkg/collectd"
 	"github.com/prometheus/client_golang/prometheus"
@@ -39,6 +40,10 @@ func main() {
 
 	coll := collectd.NewCollector(conf.CollectdBinaryAddress, conf.CollectdJSONAddress)
 	coll.Configure(conf)
+
+	if conf.DebugLog {
+		coll.SetDebugLog(log.New(os.Stderr, log.Prefix(), log.LstdFlags))
+	}
 
 	prometheus.MustRegister(coll)
 

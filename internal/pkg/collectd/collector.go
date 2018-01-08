@@ -32,13 +32,14 @@ type dataSink interface {
 }
 
 type Collector struct {
-	ch      chan api.ValueList
-	values  map[string]api.ValueList
-	rw      *sync.RWMutex
-	srcs    []dataCollector
-	address string
-	router  *mux.Router
-	conv    *nameconv.NameConverter
+	ch       chan api.ValueList
+	values   map[string]api.ValueList
+	rw       *sync.RWMutex
+	srcs     []dataCollector
+	address  string
+	router   *mux.Router
+	conv     *nameconv.NameConverter
+	debugLog *log.Logger
 }
 
 func NewCollector(binaryProtoAddress, httpJSONAddress string) *Collector {
@@ -70,6 +71,11 @@ func NewCollector(binaryProtoAddress, httpJSONAddress string) *Collector {
 	return c
 }
 
+func (c *Collector) SetDebugLog(l *log.Logger) *Collector {
+	c.debugLog = l
+	return c
+}
+
 func (c *Collector) Configure(conf Config) error {
 	for _, src := range c.srcs {
 		if err := src.Configure(conf); err != nil {
@@ -90,6 +96,7 @@ func (c *Collector) Configure(conf Config) error {
 }
 
 func (c *Collector) Run(ctx context.Context) {
+	log.Printf("Enabling data sources...")
 	for _, src := range c.srcs {
 		go src.Run(ctx)
 	}
@@ -103,6 +110,10 @@ func (c *Collector) Run(ctx context.Context) {
 func (c Collector) processSamples() {
 	ticker := time.NewTicker(time.Minute).C
 	for {
+		if c.debugLog != nil {
+			c.debugLog.Printf("Processing samples")
+		}
+
 		select {
 		case vl := <-c.ch:
 			c.update(vl)
@@ -115,6 +126,9 @@ func (c Collector) processSamples() {
 
 func (c Collector) update(vl api.ValueList) {
 	id := vl.Identifier.String()
+	if c.debugLog != nil {
+		c.debugLog.Printf("Updating: %s", id)
+	}
 	c.rw.Lock()
 	c.values[id] = vl
 	c.rw.Unlock()
@@ -125,6 +139,9 @@ func (c Collector) purge(now time.Time) {
 	for id, vl := range c.values {
 		expiration := vl.Time.Add(vl.Interval)
 		if expiration.Before(now) {
+			if c.debugLog != nil {
+				c.debugLog.Printf("Purging: %s", id)
+			}
 			delete(c.values, id)
 		}
 	}
@@ -132,6 +149,9 @@ func (c Collector) purge(now time.Time) {
 }
 
 func (c Collector) Write(_ context.Context, vl *api.ValueList) error {
+	if c.debugLog != nil {
+		log.Printf("Writing: %s", vl.Identifier.String())
+	}
 	c.ch <- *vl
 	return nil
 }
