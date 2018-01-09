@@ -32,20 +32,24 @@ func init() {
 
 func main() {
 	conf := collectd.ConfigFromCommandLine()
-
 	log.Printf("Config: %#v", conf)
 
 	log.Printf("Starting")
 	defer log.Printf("Terminated.")
 
 	coll := collectd.NewCollector(conf.CollectdBinaryAddress, conf.CollectdJSONAddress)
-	coll.Configure(conf)
-
 	if conf.DebugLog {
 		coll.SetDebugLog(log.New(os.Stderr, log.Prefix(), log.LstdFlags))
 	}
+	err := coll.Configure(conf)
+	if err != nil {
+		log.Fatalf("Collector configuration failed: %s", err)
+	}
+
+	log.Printf("Ready")
 
 	prometheus.MustRegister(coll)
 
+	log.Printf("Running")
 	coll.Run(context.Background())
 }

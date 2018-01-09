@@ -78,7 +78,13 @@ func (c *Collector) SetDebugLog(l *log.Logger) *Collector {
 
 func (c *Collector) Configure(conf Config) error {
 	for _, src := range c.srcs {
+		if c.debugLog != nil {
+			c.debugLog.Printf("Configuring: %#v", src)
+		}
 		if err := src.Configure(conf); err != nil {
+			if c.debugLog != nil {
+				c.debugLog.Printf("Configure failed: %s", err)
+			}
 			return err
 		}
 	}
@@ -92,17 +98,21 @@ func (c *Collector) Configure(conf Config) error {
 		Name(name).
 		Handler(Logger(promhttp.Handler(), name))
 
+	if c.debugLog != nil {
+		c.debugLog.Printf("Collector configured\n")
+	}
+
 	return nil
 }
 
 func (c *Collector) Run(ctx context.Context) {
+	log.Printf("Sample processing loop: starting")
+	go c.processSamples()
+
 	log.Printf("Enabling data sources...")
 	for _, src := range c.srcs {
 		go src.Run(ctx)
 	}
-
-	log.Printf("Sample processing loop: starting")
-	go c.processSamples()
 
 	log.Printf("Prometheus endpoint: starting")
 	log.Fatal(http.ListenAndServe(c.address, c.router))
