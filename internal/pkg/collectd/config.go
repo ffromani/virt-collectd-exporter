@@ -13,6 +13,8 @@ type Config struct {
 	MetricsURLPath         string
 	CollectdJSONURLPath    string
 	DebugLog               bool
+	MetricsSource          string
+	MetricsPrefix          string
 }
 
 func ConfigFromCommandLine() Config {
@@ -27,6 +29,8 @@ func ConfigFromCommandLine() Config {
 	flag.StringVar(&conf.MetricsAddress, "metrics-address", ":9103", "Address on which to expose metrics.")
 	flag.StringVar(&conf.MetricsURLPath, "metrics-url-path", "/metrics", "Prometheus metrics URL path.")
 	flag.BoolVar(&conf.DebugLog, "debug-log", false, "Enable verbose debug log.")
+	flag.StringVar(&conf.MetricsSource, "source", "virt", "Source identifier string.")
+	flag.StringVar(&conf.MetricsPrefix, "prefix", "vce", "Metrics name prefix.")
 	flag.Parse()
 	return conf
 }

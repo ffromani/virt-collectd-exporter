@@ -37,7 +37,7 @@ func main() {
 	log.Printf("Starting")
 	defer log.Printf("Terminated.")
 
-	coll := collectd.NewCollector(conf.CollectdBinaryAddress, conf.CollectdJSONAddress)
+	coll := collectd.NewCollector(conf)
 	if conf.DebugLog {
 		coll.SetDebugLog(log.New(os.Stderr, log.Prefix(), log.LstdFlags))
 	}

@@ -42,32 +42,32 @@ type Collector struct {
 	debugLog *log.Logger
 }
 
-func NewCollector(binaryProtoAddress, httpJSONAddress string) *Collector {
+func NewCollector(conf Config) *Collector {
 	c := &Collector{
 		ch:     make(chan api.ValueList, 0),
 		values: make(map[string]api.ValueList),
 		rw:     &sync.RWMutex{},
 	}
-	if binaryProtoAddress != "" {
-		log.Printf("CollectD binary protocol endpoint: '%s'", binaryProtoAddress)
+	if conf.CollectdBinaryAddress != "" {
+		log.Printf("CollectD binary protocol endpoint: '%s'", conf.CollectdBinaryAddress)
 		bin := &binaryProtoCollector{
-			address: binaryProtoAddress,
+			address: conf.CollectdBinaryAddress,
 			srv: &network.Server{
-				Addr:   binaryProtoAddress,
+				Addr:   conf.CollectdBinaryAddress,
 				Writer: c,
 			},
 		}
 		c.srcs = append(c.srcs, bin)
 	}
-	if httpJSONAddress != "" {
-		log.Printf("CollectD HTTP JSON protocol endpoint: '%s'", httpJSONAddress)
+	if conf.CollectdJSONAddress != "" {
+		log.Printf("CollectD HTTP JSON protocol endpoint: '%s'", conf.CollectdJSONAddress)
 		hj := &httpJSONCollector{
-			address: httpJSONAddress,
+			address: conf.CollectdJSONAddress,
 			sink:    c,
 		}
 		c.srcs = append(c.srcs, hj)
 	}
-	c.conv, _ = nameconv.NewNameConverter("virt", "virt")
+	c.conv, _ = nameconv.NewNameConverter(conf.MetricsSource, conf.MetricsPrefix)
 	return c
 }
 
