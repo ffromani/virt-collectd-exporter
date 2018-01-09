@@ -130,6 +130,24 @@ func TestNameConverterName(t *testing.T) {
 			DSNames: []string{"value"},
 			Values:  []api.Value{api.Gauge(0)},
 		}, 0, "collectd", "collectd_docker_cpu_percent"},
+		// avoid duplicated prefix
+		{api.ValueList{
+			Identifier: api.Identifier{
+				Plugin: "virt",
+				Type:   "cpu",
+			},
+			DSNames: []string{"value"},
+			Values:  []api.Value{api.Derive(0)},
+		}, 0, "virt", "virt_cpu_total"},
+		// avoid duplicated suffix
+		{api.ValueList{
+			Identifier: api.Identifier{
+				Plugin: "virt",
+				Type:   "cpu_total",
+			},
+			DSNames: []string{"value"},
+			Values:  []api.Value{api.Counter(0)},
+		}, 0, "test", "test_virt_cpu_total"},
 	}
 
 	for _, c := range cases {
