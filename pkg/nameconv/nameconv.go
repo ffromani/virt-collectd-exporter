@@ -140,7 +140,7 @@ func (n *NameConverter) convertName(vldesc VLDesc) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return strings.Replace(name, ".", "_", -1), nil
+	return strings.Replace(n.prefix+name, ".", "_", -1), nil
 }
 
 func (n *NameConverter) userName(vldesc VLDesc) (string, error) {
@@ -158,24 +158,12 @@ func (n *NameConverter) builtinName(vldesc VLDesc) (string, error) {
 	if vldesc.Plugin != vldesc.Type {
 		name += vldesc.Plugin + "_"
 	}
-
-	if n.prefix != "" {
-		// edge case: duplicated prefix
-		if !strings.HasPrefix(name, n.prefix) {
-			name = n.prefix + name
-		}
-	}
-
 	name += vldesc.Type
 	if dsname := vldesc.DSName; dsname != "value" {
 		name += "_" + dsname
 	}
-
 	if vldesc.IsTotal {
-		// edge case: duplicated total
-		if !strings.HasSuffix(name, "total") {
-			name += "_total"
-		}
+		name += "_total"
 	}
 	return name, nil
 }
