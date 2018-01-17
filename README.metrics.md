@@ -39,3 +39,10 @@ curl http://127.0.0.1:8080/apis/metrics.k8s.io/v1beta1/
   ]
 }
 ```
+
+== Accessing custom metrics (WIP)
+
+0. useful [walkthrough here](https://github.com/DirectXMan12/k8s-prometheus-adapter/blob/master/docs/walkthrough.md)
+   [another here](https://github.com/luxas/kubeadm-workshop)
+1. we need to set up the [aggregation layer](https://kubernetes.io/docs/tasks/access-kubernetes-api/configure-aggregation-layer/)
+2. to be continued...
