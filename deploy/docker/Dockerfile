@@ -32,7 +32,7 @@ ADD image/scripts/collectd-deps.conf /etc/systemd/system/collectd.service.d/
 ADD image/scripts/collectd-deploy.service /etc/systemd/system/
 ADD image/scripts/collectd-deploy.sh /usr/libexec/
 
-ADD cmd/virt-collectd-exporter/virt-collectd-exporter /usr/sbin/
+ADD _output/virt-collectd-exporter /usr/sbin/
 ADD image/scripts/virt-collectd-exporter.service /etc/systemd/system/
 
 RUN systemctl enable collectd-deploy.service collectd.service virt-collectd-exporter.service
