@@ -2,6 +2,9 @@ FROM centos:7.4.1708
 ENV container docker
 
 LABEL maintainer Francesco Romani <fromani@redhat.com>
+# source material:
+# https://developers.redhat.com/blog/2016/09/13/running-systemd-in-a-non-privileged-container/
+# https://developers.redhat.com/blog/2014/05/05/running-systemd-within-docker-container/
 
 RUN cd /lib/systemd/system/sysinit.target.wants/; ls | grep -v systemd-tmpfiles-setup | xargs rm -f $1 \
 rm -f /lib/systemd/system/multi-user.target.wants/*;\
@@ -37,6 +40,7 @@ ADD image/scripts/virt-collectd-exporter.service /etc/systemd/system/
 
 RUN systemctl enable collectd-deploy.service collectd.service virt-collectd-exporter.service
 
+VOLUME  ["/sys/fs/cgroup"]
 # https://developers.redhat.com/blog/2016/09/13/running-systemd-in-a-non-privileged-container/
 STOPSIGNAL SIGRTMIN+3
 
